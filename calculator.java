@@ -8,23 +8,32 @@ public class calculator{
     //main method
     public static void main( String args[] ){
         System.out.println("Enter your input in the following format:");
-        System.out.println("<decimal> <operator> <decimal>");
+        System.out.println("<number> <operator> <number> ...");
         Scanner scan = new Scanner(System.in);
         String input = scan.nextLine();
         String[] tokens = input.split(" "); //split by whitespace
-        
-        if (tokens.length != 3) {
-            System.out.println("Invalid input format. Please use: <number> <operator> <number>");
-            scan.close();
-            return;
-        }
 
         //processing
         try {
-            double num1 = Double.parseDouble(tokens[0]);
-            char operator = tokens[1].charAt(0);
-            double num2 = Double.parseDouble(tokens[2]);
-            System.out.println("OUTPUT: " + calculate(num1, num2, operator));
+            List<Double> numbers = new ArrayList<>();
+            List<Character> operators = new ArrayList<>();
+            
+            for (int i = 0; i < tokens.length; i++) {
+                if (i % 2 == 0) {//number
+                    numbers.add(parseNumber(tokens[i])); 
+                } else { //operator
+                    operators.add(tokens[i].charAt(0)); 
+                }
+            }
+        
+            double result = numbers.get(0);
+            for (int i = 0; i < operators.size(); i++) { //allows for multiple inputs
+                char operator = operators.get(i);
+                double num2 = numbers.get(i + 1);
+                result = calculate(result, num2, operator);
+            }
+
+            System.out.println("OUTPUT: " + result);
         } catch (NumberFormatException e) {
             System.out.println("Invalid format. Please make sure you enter valid numbers.");
         } catch (Exception e) {
@@ -34,13 +43,17 @@ public class calculator{
         }
     }
         
+    //makes it so user can input either integer or decimal 
+    public static double parseNumber(String token) {
+        if (token.contains(".")) {
+            return Double.parseDouble(token);
+        } else {
+            return Integer.parseInt(token);
+        }
+    }
 
-
-    //basic functions
+    //basic functions of operations
     public static double add (double num1, double num2){ 
-    // for more than two inputs,
-    // put put the earlier result as num1 and the next input as num2, 
-    //and so on
         return num1 + num2;
     }
     public static double subtract (double num1, double num2){ 
@@ -56,6 +69,7 @@ public class calculator{
         return num1 / num2;
     }
 
+    //handles calculations
     public static double calculate(double num1, double num2, char operator){
         double result = 0;
         switch (operator) {
